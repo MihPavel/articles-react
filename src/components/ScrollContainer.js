@@ -1,64 +1,36 @@
-import React, {Component} from 'react'
-import ArticleList from './ArticleList'
-
-const containerStyle = {
-	overflow: "auto",
-	height: "300px",
-	width: "300px",
-	border: "1px solid black"
-}
+// @flow
+import React, {Component} from 'react';
+import ArticleList from './ArticleList';
+import { scrollContainerStyle } from './../style/ScrollContainerStyle';
 
 export default class ScrollContainer extends Component{
-	constructor(props){
-		super(props);
-		this.state = {
-			scroll: 0,
-			count: props.articles.length
-		}
-		this.articles = this.props.articles;
+	state = {
+		scroll: 0,
+		articles: this.props.articles
 	}
-	removeArticle = (id) => () => {
-		for (let i = 0; i < this.articles.length; i +=1){
-			if(this.articles[i].id === id){
-				this.articles.splice(i, 1);
-				this.setState({
-					count: this.articles.length
-				});
-				break;
+	removeArticle = (idArticleRemove) => {
+		let articles = this.state.articles;
+		let newStateArticles = articles.filter((NextArticle) => {
+			if(NextArticle.id != idArticleRemove){
+				return NextArticle;
 			}
-		}
+		});
+		this.setState({
+			articles: newStateArticles
+		});
 	}
-  onscroll = (ev) =>{
-		let oldScroll = this.state.scroll;
-    let newScroll = ev.nativeEvent.target.scrollTop;
-    
-		if(Math.abs(newScroll - oldScroll) > 50){
-			this.setState({
-				scroll: newScroll
-			});
-			console.log(newScroll);
-		}
-  }
-  getRangeRenderArticle = () => {
-    let {scroll} = this.state;
-    const ARTICLE_HEIGHT = 100;
-
-		if(scroll < ARTICLE_HEIGHT){
-			scroll = ARTICLE_HEIGHT;
-		}
-		return {
-			start: Math.floor((scroll - ARTICLE_HEIGHT) / ARTICLE_HEIGHT),
-			end: Math.floor((scroll + ARTICLE_HEIGHT * 3) / ARTICLE_HEIGHT)
-		}
+  onscroll = (e) => {
+    let newScroll = e.target.scrollTop;
+		this.setState({
+			scroll: newScroll
+		});
 	}
   render(){
-		
-    let rangeArgicle = this.getRangeRenderArticle();
-
+		let {scroll, articles} = this.state;
     return(
-      <div style={containerStyle} onScroll={this.onscroll}>
-				<ArticleList articles = {this.articles} 
-										 rangeArgicle = {rangeArgicle} 
+      <div style={scrollContainerStyle} onScroll={this.onscroll}>
+				<ArticleList articles = {articles}
+										 scroll = {scroll}
 										 removeArticle = {this.removeArticle}/>
       </div>
     )
